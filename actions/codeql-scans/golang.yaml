@@ -1,0 +1,26 @@
+
+name: "codeql scan with tail of bits queries"
+inputs:
+  github-token:
+    required: true
+  query-packs:
+    required: false
+    default: "trailofbits/go-queries"
+  languages:
+    required: false
+    default: "go"
+runs:
+  using: "composite"
+  steps:
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@28deaeda66b76a05916b6923827895f2b14ab387
+      with:
+        languages: ${{ inputs.languages }}
+        packs: ${{ inputs.query-packs }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@28deaeda66b76a05916b6923827895f2b14ab387
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
