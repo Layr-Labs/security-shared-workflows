@@ -1,54 +1,31 @@
 name: Claude Code Review
+description: 'Automated code review using Claude AI'
 
-on:
-  issue_comment:
-    types: [created]
-  pull_request_review_comment:
-    types: [created]
-  pull_request_review:
-    types: [submitted]
-  pull_request:
-    types: [opened, assigned]
+inputs:
+  anthropic_api_key:
+    description: 'Anthropic API key for Claude'
+    required: true
+  max_turns:
+    description: 'Maximum number of turns for Claude interaction'
+    required: false
+    default: '10'
+  timeout_minutes:
+    description: 'Timeout for Claude interaction in minutes'
+    required: false
+    default: '5'
 
-jobs:
-  claude:
-    # Runs only if @claude is mentioned by organization members/owners/collaborators
-    # OR if PR is created by owner/collaborator
-    if: |
-      (github.event_name == 'issue_comment' && 
-       contains(github.event.comment.body, '@claude') &&
-       contains('MEMBER OWNER COLLABORATOR', github.event.comment.author_association)) ||
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      with:
+        fetch-depth: 1
 
-      (github.event_name == 'pull_request_review_comment' && 
-       contains(github.event.comment.body, '@claude') &&
-       contains('MEMBER OWNER COLLABORATOR', github.event.comment.author_association)) ||
-
-      (github.event_name == 'pull_request_review' && 
-       contains(github.event.review.body, '@claude') &&
-       contains('MEMBER OWNER COLLABORATOR', github.event.review.author_association)) ||
-
-      (github.event_name == 'issues' && 
-       (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) &&
-       contains('MEMBER OWNER COLLABORATOR', github.event.issue.user.author_association))
-
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-      id-token: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4.2.2
-        with:
-          fetch-depth: 1
-
-      - name: Run Claude Code
-        uses: anthropics/claude-code-action@e26577a930883943cf9d90885cd1e8da510078dd
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          max_turns: "10"
-          timeout_minutes: "5"
+    - name: Run Claude Code
+      uses: anthropics/claude-code-action@e26577a930883943cf9d90885cd1e8da510078dd
+      with:
+        anthropic_api_key: ${{ inputs.anthropic_api_key }}
+        max_turns: ${{ inputs.max_turns }}
+        timeout_minutes: ${{ inputs.timeout_minutes }}
 
