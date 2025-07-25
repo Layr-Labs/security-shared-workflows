@@ -7,11 +7,11 @@ inputs:
     description: 'Anthropic API key for Claude'
     required: true
   max_turns:
-    description: 'Maximum number of turns for Claude interaction'
+    description: 'Maximum number of turns for Claude interaction (max: 10)'
     required: false
-    default: '10'
+    default: '5'
   timeout_minutes:
-    description: 'Timeout for Claude interaction in minutes'
+    description: 'Timeout for Claude interaction in minutes (max: 10)'
     required: false
     default: '5'
 
@@ -23,6 +23,18 @@ runs:
       with:
         fetch-depth: 1
 
+    - name: Validate inputs
+      shell: bash
+      run: |
+        if [ "${{ inputs.max_turns }}" -gt 10 ]; then
+          echo "Error: max_turns cannot exceed 10"
+          exit 1
+        fi
+        if [ "${{ inputs.timeout_minutes }}" -gt 10 ]; then
+          echo "Error: timeout_minutes cannot exceed 10"
+          exit 1
+        fi
+        
     - name: Run Claude Code
       uses: anthropics/claude-code-action@e26577a930883943cf9d90885cd1e8da510078dd
       with:
