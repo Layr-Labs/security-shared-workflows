@@ -1,4 +1,5 @@
 name: Claude Code Review
+
 description: 'Automated code review using Claude AI'
 
 inputs:
@@ -28,4 +29,5 @@ runs:
         anthropic_api_key: ${{ inputs.anthropic_api_key }}
         max_turns: ${{ inputs.max_turns }}
         timeout_minutes: ${{ inputs.timeout_minutes }}
+
 
