@@ -1,45 +1,36 @@
-name: Claude Code Review
-
-description: 'Automated code review using Claude AI'
+name: "Claude Code Security Review"
+description: "AI-powered security review using Claude with configurable options"
 
 inputs:
-  anthropic_api_key:
-    description: 'Anthropic API key for Claude'
+  claude-api-key:
+    description: "Anthropic Claude API key for security analysis"
     required: true
-  max_turns:
-    description: 'Maximum number of turns for Claude interaction (max: 10)'
+  custom-security-scan-instructions:
+    description: "Path to custom security scan instructions text file"
     required: false
-    default: '5'
-  timeout_minutes:
-    description: 'Timeout for Claude interaction in minutes (max: 10)'
+    default: ""
+  false-positive-filtering-instructions:
+    description: "Path to custom false positive filtering instructions text file"
     required: false
-    default: '5'
+    default: ""
+  claudecode-timeout:
+    description: "Timeout for ClaudeCode analysis in minutes"
+    required: false
+    default: "20"
+  exclude-directories:
+    description: "Comma-separated list of directories to exclude from scanning"
+    required: false
+    default: ""
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+    - name: Run Claude Code Security Review
+      uses: anthropics/claude-code-security-review@main
       with:
-        fetch-depth: 1
-
-    - name: Validate inputs
-      shell: bash
-      run: |
-        if [ "${{ inputs.max_turns }}" -gt 10 ]; then
-          echo "Error: max_turns cannot exceed 10"
-          exit 1
-        fi
-        if [ "${{ inputs.timeout_minutes }}" -gt 10 ]; then
-          echo "Error: timeout_minutes cannot exceed 10"
-          exit 1
-        fi
-        
-    - name: Run Claude Code
-      uses: anthropics/claude-code-action@e26577a930883943cf9d90885cd1e8da510078dd
-      with:
-        anthropic_api_key: ${{ inputs.anthropic_api_key }}
-        max_turns: ${{ inputs.max_turns }}
-        timeout_minutes: ${{ inputs.timeout_minutes }}
-
-
+        claude-api-key: ${{ inputs.claude-api-key }}
+        comment-pr: true
+        exclude-directories: ${{ inputs.exclude-directories }}
+        claudecode-timeout: ${{ inputs.claudecode-timeout }}
+        false-positive-filtering-instructions: ${{ inputs.false-positive-filtering-instructions }}
+        custom-security-scan-instructions: ${{ inputs.custom-security-scan-instructions }}
