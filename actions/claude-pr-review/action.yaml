@@ -26,7 +26,7 @@ runs:
   using: "composite"
   steps:
     - name: Run Claude Code Security Review
-      uses: anthropics/claude-code-security-review@main
+      uses: anthropics/claude-code-security-review@0c6a49f1fa56a1d472575da86a94dbc1edb78eda
       with:
         claude-api-key: ${{ inputs.claude-api-key }}
         comment-pr: true
